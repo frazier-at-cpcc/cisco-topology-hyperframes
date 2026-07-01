@@ -1,0 +1,10 @@
+# Dependencies
+node_modules/
+
+# Build / render artifacts
+*.mp4
+snapshots/
+*.png
+
+# SDD scratch workspace (task briefs, reports, review packages, progress ledger)
+.superpowers/
