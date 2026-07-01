@@ -1,0 +1,72 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["nodes", "links"],
+  "properties": {
+    "canvas": {
+      "type": "object",
+      "properties": {
+        "width": { "type": "number" },
+        "height": { "type": "number" },
+        "padding": { "type": "number" }
+      }
+    },
+    "layout": {
+      "type": "object",
+      "properties": {
+        "algorithm": { "type": "string", "enum": ["layered", "ring", "star", "grid", "manual"] },
+        "direction": { "type": "string", "enum": ["DOWN", "UP", "LEFT", "RIGHT"] },
+        "seed": { "type": "number" }
+      }
+    },
+    "nodes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "type"],
+        "properties": {
+          "id": { "type": "string" },
+          "type": { "type": "string" },
+          "label": { "type": "string" },
+          "x": { "type": "number" },
+          "y": { "type": "number" },
+          "tier": { "type": "number" },
+          "group": { "type": "string" }
+        }
+      }
+    },
+    "links": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "from", "to"],
+        "properties": {
+          "id": { "type": "string" },
+          "from": { "type": "string" },
+          "to": { "type": "string" },
+          "type": { "type": "string" },
+          "label": { "type": "string" },
+          "bidirectional": { "type": "boolean" }
+        }
+      }
+    },
+    "events": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["at", "type"],
+        "properties": {
+          "at": { "type": "number" },
+          "type": { "type": "string", "enum": ["reveal", "flow", "setState", "fail"] },
+          "target": { "type": "string" },
+          "mode": { "type": "string" },
+          "path": { "type": "array", "items": { "type": "string" } },
+          "label": { "type": "string" },
+          "kind": { "type": "string" },
+          "state": { "type": "string" },
+          "reroute": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    }
+  }
+}
