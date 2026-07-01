@@ -11,12 +11,14 @@ export async function applyLayout(topo) {
 
   if (needsLayout && algorithm !== 'manual') {
     const elk = new ELK();
+    const seed = topo.layout?.seed;
+    const elkSeed = (seed == null || seed === 0) ? 1 : seed;
     const graph = {
       id: 'root',
       layoutOptions: {
         'elk.algorithm': 'layered',
         'elk.direction': topo.layout?.direction || 'DOWN',
-        'elk.randomSeed': String(topo.layout?.seed ?? 1),
+        'elk.randomSeed': String(elkSeed),
         'elk.layered.spacing.nodeNodeBetweenLayers': '140',
         'elk.spacing.nodeNode': '90'
       },
@@ -33,10 +35,23 @@ export async function applyLayout(topo) {
     for (const n of nodes) {
       if (n.x == null || n.y == null) {
         const p = pos.get(n.id);
-        n.x = Math.round(p.x + NODE_W / 2) + canvas.padding;
-        n.y = Math.round(p.y + NODE_H / 2) + canvas.padding;
+        if (p) {
+          n.x = Math.round(p.x + NODE_W / 2) + canvas.padding;
+          n.y = Math.round(p.y + NODE_H / 2) + canvas.padding;
+        }
       }
     }
   }
+
+  let fi = 0;
+  for (const n of nodes) {
+    if (n.x == null || n.y == null) {
+      const col = fi % 6, row = Math.floor(fi / 6);
+      n.x = canvas.padding + col * 160;
+      n.y = canvas.padding + row * 160;
+      fi++;
+    }
+  }
+
   return { ...topo, canvas, nodes };
 }

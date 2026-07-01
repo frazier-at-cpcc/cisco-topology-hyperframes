@@ -36,3 +36,32 @@ test('fills canvas defaults', async () => {
   assert.equal(out.canvas.width, 1920);
   assert.equal(out.canvas.height, 1080);
 });
+
+test('is deterministic when layout.seed is explicitly 0', async () => {
+  const seeded = { ...topo, layout: { seed: 0 } };
+  const a = await applyLayout(seeded);
+  const b = await applyLayout(seeded);
+  assert.deepEqual(a.nodes.map(n => [n.id, n.x, n.y]), b.nodes.map(n => [n.id, n.x, n.y]));
+});
+
+test('manual algorithm with a partially-pinned node still yields integer coords for every node', async () => {
+  const manual = {
+    ...topo,
+    layout: { algorithm: 'manual' },
+    nodes: [
+      { id: 'R1', type: 'router', x: 500, y: 300 },
+      { id: 'SW1', type: 'switch' },
+      { id: 'A', type: 'pc' }
+    ]
+  };
+  const out = await applyLayout(manual);
+  for (const n of out.nodes) {
+    assert.equal(typeof n.x, 'number');
+    assert.equal(typeof n.y, 'number');
+    assert.equal(n.x, Math.round(n.x));
+    assert.equal(n.y, Math.round(n.y));
+  }
+  const r1 = out.nodes.find(n => n.id === 'R1');
+  assert.equal(r1.x, 500);
+  assert.equal(r1.y, 300);
+});
