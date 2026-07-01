@@ -1,4 +1,5 @@
-import { readFileSync, writeFileSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+import { dirname } from 'node:path';
 import { validateTopology } from './engine/validate.mjs';
 import { applyLayout } from './engine/layout.mjs';
 import { renderSvg } from './engine/renderer.mjs';
@@ -7,7 +8,8 @@ import { planTimeline } from './engine/animatorPlan.mjs';
 const GSAP = 'https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js';
 
 export function blockHtml({ id, svg, tweens, width, height, duration }) {
-  const tweensJson = JSON.stringify(tweens);
+  if (!/^[A-Za-z0-9_-]+$/.test(id)) throw new Error(`Invalid composition id: ${JSON.stringify(id)} (must match ^[A-Za-z0-9_-]+$)`);
+  const tweensJson = JSON.stringify(tweens).replace(/</g, '\\u003c');
   return `<!doctype html>
 <html>
 <head><meta charset="UTF-8" /></head>
@@ -36,7 +38,8 @@ export function blockHtml({ id, svg, tweens, width, height, duration }) {
       var tl = gsap.timeline({ paused: true });
       TWEENS.forEach(function (tw) {
         var el = root.querySelector(tw.selector);
-        if (el) tl.fromTo(el, tw.from, Object.assign({}, tw.to), tw.at);
+        if (el) { tl.fromTo(el, tw.from, Object.assign({}, tw.to), tw.at); }
+        else { console.warn('cisco-topology: no element for ' + tw.selector); }
       });
       window.__timelines["${id}"] = tl;
     })();
@@ -66,6 +69,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   const out = outFlag > 0 ? process.argv[outFlag + 1] : `compositions/${id}.html`;
   const topo = JSON.parse(readFileSync(file, 'utf8'));
   const html = await buildBlock(topo, { id });
+  mkdirSync(dirname(out), { recursive: true });
   writeFileSync(out, html);
   console.log(`Wrote ${out}`);
   console.log('Host wiring snippet:');

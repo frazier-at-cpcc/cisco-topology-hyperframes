@@ -25,7 +25,7 @@
         "type": "object",
         "required": ["id", "type"],
         "properties": {
-          "id": { "type": "string" },
+          "id": { "type": "string", "pattern": "^[A-Za-z0-9_-]+$" },
           "type": { "type": "string" },
           "label": { "type": "string" },
           "x": { "type": "number" },
@@ -41,7 +41,7 @@
         "type": "object",
         "required": ["id", "from", "to"],
         "properties": {
-          "id": { "type": "string" },
+          "id": { "type": "string", "pattern": "^[A-Za-z0-9_-]+$" },
           "from": { "type": "string" },
           "to": { "type": "string" },
           "type": { "type": "string" },
