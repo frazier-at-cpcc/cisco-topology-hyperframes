@@ -65,3 +65,26 @@ test('manual algorithm with a partially-pinned node still yields integer coords 
   assert.equal(r1.x, 500);
   assert.equal(r1.y, 300);
 });
+
+test('determinism holds for an ambiguous fan-out topology', async () => {
+  const fan = {
+    nodes: [
+      { id: 'SW1', type: 'switch' },
+      { id: 'A', type: 'pc' }, { id: 'B', type: 'pc' }, { id: 'C', type: 'pc' },
+      { id: 'D', type: 'pc' }, { id: 'E', type: 'pc' }, { id: 'F', type: 'pc' }
+    ],
+    links: [
+      { id: 'a', from: 'SW1', to: 'A' }, { id: 'b', from: 'SW1', to: 'B' },
+      { id: 'c', from: 'SW1', to: 'C' }, { id: 'd', from: 'SW1', to: 'D' },
+      { id: 'e', from: 'SW1', to: 'E' }, { id: 'f', from: 'SW1', to: 'F' }
+    ]
+  };
+  const runs = [];
+  for (let i = 0; i < 5; i++) {
+    const out = await applyLayout(fan);
+    runs.push(out.nodes.map(n => [n.id, n.x, n.y]));
+  }
+  for (let i = 1; i < runs.length; i++) {
+    assert.deepEqual(runs[i], runs[0], `run ${i} differs from run 0 — layout is non-deterministic`);
+  }
+});
