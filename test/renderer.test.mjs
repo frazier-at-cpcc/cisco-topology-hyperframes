@@ -31,3 +31,15 @@ test('escapes label text', () => {
   const svg = renderSvg({ ...topo, nodes: [ { id: 'X', type: 'pc', x: 10, y: 10, label: 'A & B <ok>' } ], links: [] });
   assert.match(svg, /A &amp; B &lt;ok&gt;/);
 });
+
+test('unknown/unshipped type normalizes to pc', () => {
+  const svg = renderSvg({ ...topo, nodes: [ { id: 'LB1', type: 'loadbalancer', x: 10, y: 10, label: 'LB' } ], links: [] });
+  assert.match(svg, /<g id="node-LB1"[^]*?href="#icon-pc"/);
+  assert.match(svg, /<defs>[^]*?icon-pc[^]*?<\/defs>/);
+  assert.doesNotMatch(svg, /href="#icon-loadbalancer"/);
+});
+
+test('a valid type is unchanged', () => {
+  const svg = renderSvg(topo);
+  assert.match(svg, /<g id="node-R1"[^]*?href="#icon-router"/);
+});

@@ -32,3 +32,9 @@ test('rejects a node missing required type', () => {
   const r = validateTopology(bad);
   assert.equal(r.valid, false);
 });
+
+test('rejects a node with an injection type', () => {
+  const bad = { ...good, nodes: [ { id: 'R1', type: 'router"><script>' }, { id: 'SW1', type: 'switch' } ] };
+  const r = validateTopology(bad);
+  assert.equal(r.valid, false);
+});

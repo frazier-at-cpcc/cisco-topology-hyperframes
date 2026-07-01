@@ -26,7 +26,7 @@
         "required": ["id", "type"],
         "properties": {
           "id": { "type": "string", "pattern": "^[A-Za-z0-9_-]+$" },
-          "type": { "type": "string" },
+          "type": { "type": "string", "pattern": "^[A-Za-z0-9_-]+$" },
           "label": { "type": "string" },
           "x": { "type": "number" },
           "y": { "type": "number" },
@@ -44,7 +44,7 @@
           "id": { "type": "string", "pattern": "^[A-Za-z0-9_-]+$" },
           "from": { "type": "string" },
           "to": { "type": "string" },
-          "type": { "type": "string" },
+          "type": { "type": "string", "pattern": "^[A-Za-z0-9_-]+$" },
           "label": { "type": "string" },
           "bidirectional": { "type": "boolean" }
         }

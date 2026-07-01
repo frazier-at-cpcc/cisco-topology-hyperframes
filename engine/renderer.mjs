@@ -1,4 +1,4 @@
-import { iconDefs } from './icons.mjs';
+import { iconDefs, ICON_TYPES } from './icons.mjs';
 
 const ICON_SIZE = 96;
 
@@ -10,7 +10,7 @@ export function linkLength(a, b) { return Math.hypot(b.x - a.x, b.y - a.y); }
 export function renderSvg(topo) {
   const { width, height } = topo.canvas;
   const byId = new Map(topo.nodes.map(n => [n.id, n]));
-  const types = [...new Set(topo.nodes.map(n => n.type))];
+  const types = [...new Set(topo.nodes.map(n => ICON_TYPES.includes(n.type) ? n.type : 'pc'))];
   const defs = iconDefs(types);
 
   const links = (topo.links || []).map(l => {
@@ -25,8 +25,12 @@ export function renderSvg(topo) {
 
   const nodes = topo.nodes.map(n => {
     const s = ICON_SIZE;
+    const iconType = ICON_TYPES.includes(n.type) ? n.type : 'pc';
+    if (!ICON_TYPES.includes(n.type)) {
+      console.warn(`cisco-topology: unknown node type "${n.type}" for node ${n.id} — using pc icon`);
+    }
     return `<g id="node-${n.id}" class="node" transform="translate(${n.x},${n.y})">`
-      + `<use href="#icon-${n.type}" x="${-s / 2}" y="${-s / 2}" width="${s}" height="${s}" />`
+      + `<use href="#icon-${iconType}" x="${-s / 2}" y="${-s / 2}" width="${s}" height="${s}" />`
       + `<text class="node-label" x="0" y="${s / 2 + 28}">${esc(n.label || n.id)}</text>`
       + `</g>`;
   }).join('\n');
