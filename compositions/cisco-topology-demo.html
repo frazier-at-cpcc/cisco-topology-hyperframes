@@ -1,0 +1,47 @@
+<!doctype html>
+<html>
+<head><meta charset="UTF-8" /></head>
+<body>
+<template>
+  <style>
+    #cisco-topology-demo { position: absolute; inset: 0; background: #0b1622; overflow: hidden; }
+    #cisco-topology-demo .topo { position: absolute; inset: 0; width: 100%; height: 100%; }
+    #cisco-topology-demo .link { stroke: #7fa8c9; stroke-width: 4; stroke-dashoffset: var(--dash, 0); }
+    #cisco-topology-demo .link-trunk { stroke-width: 7; }
+    #cisco-topology-demo .link-wireless { stroke-dasharray: 10 8; }
+    #cisco-topology-demo .link-label, #cisco-topology-demo .node-label {
+      fill: #cfe0ee; font-family: 'Segoe UI', sans-serif; font-size: 22px; text-anchor: middle;
+    }
+    #cisco-topology-demo .node-label { font-weight: 600; }
+  </style>
+  <div id="cisco-topology-demo" data-composition-id="cisco-topology-demo" data-width="1920" data-height="1080" data-duration="5">
+    <svg class="topo" viewBox="0 0 1920 1080" width="1920" height="1080" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><defs><symbol id="icon-router" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="#1f6fb2" stroke="#0d3c61" stroke-width="3"/><path d="M30 50h40M50 30v40M38 38l24 24M62 38L38 62" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round"/></symbol>
+<symbol id="icon-switch" viewBox="0 0 100 100"><rect x="15" y="30" width="70" height="40" rx="6" fill="#2c8a3d" stroke="#14431d" stroke-width="3"/><path d="M25 50h50M62 42l14 8-14 8M38 58L24 50l14-8" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="icon-pc" viewBox="0 0 100 100"><rect x="20" y="25" width="60" height="38" rx="3" fill="#334" stroke="#111" stroke-width="3"/><rect x="26" y="31" width="48" height="26" fill="#8fd3ff"/><path d="M40 70h20l4 8H36z" fill="#556"/></symbol></defs>
+<line id="link-l1" x1="232" y1="212" x2="232" y2="472" class="link link-ethernet" stroke-dasharray="260" style="--dash:0" /><text class="link-label" x="232" y="334">Gi0/1</text>
+<line id="link-l2" x1="232" y1="472" x2="212" y2="732" class="link link-ethernet" stroke-dasharray="261" style="--dash:0" />
+<line id="link-l3" x1="232" y1="472" x2="422" y2="732" class="link link-ethernet" stroke-dasharray="322" style="--dash:0" />
+<g id="node-R1" class="node" transform="translate(232,212)"><use href="#icon-router" x="-48" y="-48" width="96" height="96" /><text class="node-label" x="0" y="76">Edge R1</text></g>
+<g id="node-SW1" class="node" transform="translate(232,472)"><use href="#icon-switch" x="-48" y="-48" width="96" height="96" /><text class="node-label" x="0" y="76">Access SW1</text></g>
+<g id="node-A" class="node" transform="translate(212,732)"><use href="#icon-pc" x="-48" y="-48" width="96" height="96" /><text class="node-label" x="0" y="76">PC-A</text></g>
+<g id="node-B" class="node" transform="translate(422,732)"><use href="#icon-pc" x="-48" y="-48" width="96" height="96" /><text class="node-label" x="0" y="76">PC-B</text></g>
+</svg>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+  <script>
+    (function () {
+      window.__timelines = window.__timelines || {};
+      var TWEENS = [{"at":0.2,"selector":"#node-R1","kind":"reveal-node","from":{"opacity":0,"scale":0.6},"to":{"opacity":1,"scale":1,"duration":0.5,"ease":"back.out(1.6)"}},{"at":0.9,"selector":"#node-SW1","kind":"reveal-node","from":{"opacity":0,"scale":0.6},"to":{"opacity":1,"scale":1,"duration":0.5,"ease":"back.out(1.6)"}},{"at":1.4,"selector":"#link-l1","kind":"reveal-link-draw","from":{"--dash":260},"to":{"--dash":0,"duration":0.6,"ease":"power2.out"}},{"at":2,"selector":"#node-A","kind":"reveal-node","from":{"opacity":0,"scale":0.6},"to":{"opacity":1,"scale":1,"duration":0.5,"ease":"back.out(1.6)"}},{"at":2.3,"selector":"#link-l2","kind":"reveal-link-draw","from":{"--dash":261},"to":{"--dash":0,"duration":0.6,"ease":"power2.out"}},{"at":2.8,"selector":"#node-B","kind":"reveal-node","from":{"opacity":0,"scale":0.6},"to":{"opacity":1,"scale":1,"duration":0.5,"ease":"back.out(1.6)"}},{"at":3.1,"selector":"#link-l3","kind":"reveal-link-draw","from":{"--dash":322},"to":{"--dash":0,"duration":0.6,"ease":"power2.out"}}];
+      var root = document.getElementById('cisco-topology-demo');
+      var tl = gsap.timeline({ paused: true });
+      TWEENS.forEach(function (tw) {
+        var el = root.querySelector(tw.selector);
+        if (el) { tl.fromTo(el, tw.from, Object.assign({}, tw.to), tw.at); }
+        else { console.warn('cisco-topology: no element for ' + tw.selector); }
+      });
+      window.__timelines["cisco-topology-demo"] = tl;
+    })();
+  </script>
+</template>
+</body>
+</html>
