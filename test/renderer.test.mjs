@@ -43,3 +43,15 @@ test('a valid type is unchanged', () => {
   const svg = renderSvg(topo);
   assert.match(svg, /<g id="node-R1"[^]*?href="#icon-router"/);
 });
+
+test('renders a hidden state overlay per link and per node', () => {
+  const topo = {
+    canvas: { width: 1920, height: 1080, padding: 120 },
+    nodes: [ { id: 'R1', type: 'router', x: 300, y: 200 }, { id: 'A', type: 'pc', x: 300, y: 500 } ],
+    links: [ { id: 'l1', from: 'R1', to: 'A', type: 'ethernet' } ]
+  };
+  const svg = renderSvg(topo);
+  assert.match(svg, /<line id="link-l1-state"[^>]*class="link-state"[^>]*opacity="0"/);
+  assert.match(svg, /<circle id="node-R1-state"[^>]*class="node-state"[^>]*opacity="0"/);
+  assert.match(svg, /<circle id="node-A-state"[^>]*opacity="0"/);
+});
