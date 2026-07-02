@@ -49,6 +49,7 @@ export function blockHtml({ id, svg, tweens, width, height, duration }) {
           c.setAttribute('r', op.r); c.setAttribute('cx', 0); c.setAttribute('cy', 0); c.setAttribute('fill', op.color);
           g.appendChild(c); g.setAttribute('opacity', '0'); svg.appendChild(g);
           var p0 = op.points[0];
+          gsap.set(g, { x: p0[0], y: p0[1] }); // park on-canvas at the path start immediately, so pre-op.at seeks never see the raw (0,0) origin default
           tl.set(g, { x: p0[0], y: p0[1], opacity: 0 }, op.at);
           tl.to(g, { opacity: 1, duration: 0.2 }, op.at);
           var t = op.at + 0.2;

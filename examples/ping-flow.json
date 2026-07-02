@@ -1,0 +1,25 @@
+{
+  "canvas": { "width": 1920, "height": 1080, "padding": 140 },
+  "layout": { "algorithm": "layered", "direction": "DOWN", "seed": 1 },
+  "nodes": [
+    { "id": "R1", "type": "router", "label": "R1" },
+    { "id": "SW1", "type": "switch", "label": "SW1" },
+    { "id": "A", "type": "pc", "label": "PC-A" },
+    { "id": "B", "type": "pc", "label": "PC-B" }
+  ],
+  "links": [
+    { "id": "l1", "from": "R1", "to": "SW1" },
+    { "id": "l2", "from": "SW1", "to": "A" },
+    { "id": "l3", "from": "SW1", "to": "B" }
+  ],
+  "events": [
+    { "at": 0.2, "type": "reveal", "target": "R1" },
+    { "at": 0.6, "type": "reveal", "target": "SW1" },
+    { "at": 0.9, "type": "reveal", "target": "l1", "mode": "draw" },
+    { "at": 1.2, "type": "reveal", "target": "A" },
+    { "at": 1.4, "type": "reveal", "target": "l2", "mode": "draw" },
+    { "at": 1.7, "type": "reveal", "target": "B" },
+    { "at": 1.9, "type": "reveal", "target": "l3", "mode": "draw" },
+    { "at": 2.6, "type": "flow", "path": ["A", "SW1", "B"], "kind": "unicast", "label": "ICMP echo" }
+  ]
+}
