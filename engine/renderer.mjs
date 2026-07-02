@@ -19,7 +19,7 @@ export function renderSvg(topo) {
     const mx = Math.round((a.x + b.x) / 2), my = Math.round((a.y + b.y) / 2);
     const line = `<line id="link-${l.id}" x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" `
       + `class="link link-${l.type || 'ethernet'}" stroke-dasharray="${len}" style="--dash:0" />`;
-    const lineState = `<line id="link-${l.id}-state" x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" class="link-state" opacity="0" />`;
+    const lineState = `<line id="link-${l.id}-state" x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" class="link-state" stroke-width="6" opacity="0" />`;
     const label = l.label ? `<text class="link-label" x="${mx}" y="${my - 8}">${esc(l.label)}</text>` : '';
     return line + '\n' + lineState + (label ? '\n' + label : '');
   }).join('\n');

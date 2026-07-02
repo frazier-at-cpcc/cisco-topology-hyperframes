@@ -38,3 +38,10 @@ test('rejects a node with an injection type', () => {
   const r = validateTopology(bad);
   assert.equal(r.valid, false);
 });
+
+test('rejects a flow event with an unknown node id inside paths[]', () => {
+  const bad = { ...good, events: [ { at: 1, type: 'flow', paths: [ ['R1', 'GHOST'] ] } ] };
+  const r = validateTopology(bad);
+  assert.equal(r.valid, false);
+  assert.ok(r.errors.some(e => e.includes('GHOST')));
+});

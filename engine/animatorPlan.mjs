@@ -56,7 +56,7 @@ export function planTimeline(topo) {
       const paths = ev.paths || (ev.path ? [ev.path] : []);
       const color = FLOW_COLORS[ev.kind] || FLOW_COLORS.unicast;
       for (const path of paths) {
-        const points = path.map(id => { const n = nodeById.get(id); return [n.x, n.y]; });
+        const points = path.map(id => nodeById.get(id)).filter(Boolean).map(n => [n.x, n.y]);
         if (points.length >= 2) tweens.push({ at: ev.at, kind: 'flow', points, hopDur: HOP_DUR, color, r: PACKET_R });
       }
     } else if (ev.type === 'setState') {
@@ -75,8 +75,8 @@ export function planTimeline(topo) {
       if (selector) tweens.push({ at: ev.at, kind: 'set-state', selector, color: STATE_STYLES.down.color, opacity: STATE_STYLES.down.opacity, duration: 0.3 });
       if (point) tweens.push({ at: ev.at, kind: 'badge', point, color: STATE_STYLES.down.color, size: 18, duration: 0.3 });
       if (ev.reroute && ev.reroute.length >= 2) {
-        const points = ev.reroute.map(id => { const n = nodeById.get(id); return [n.x, n.y]; });
-        tweens.push({ at: ev.at + 0.4, kind: 'flow', points, hopDur: HOP_DUR, color: FLOW_COLORS.unicast, r: PACKET_R });
+        const points = ev.reroute.map(id => nodeById.get(id)).filter(Boolean).map(n => [n.x, n.y]);
+        if (points.length >= 2) tweens.push({ at: ev.at + 0.4, kind: 'flow', points, hopDur: HOP_DUR, color: FLOW_COLORS.unicast, r: PACKET_R });
       }
     }
   }

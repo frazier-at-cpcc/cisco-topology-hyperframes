@@ -55,3 +55,8 @@ test('renders a hidden state overlay per link and per node', () => {
   assert.match(svg, /<circle id="node-R1-state"[^>]*class="node-state"[^>]*opacity="0"/);
   assert.match(svg, /<circle id="node-A-state"[^>]*opacity="0"/);
 });
+
+test('link state overlay is stroke-width 6, not the 1px default', () => {
+  const svg = renderSvg(topo);
+  assert.match(svg, /<line id="link-l1-state"[^>]*stroke-width="6"/);
+});

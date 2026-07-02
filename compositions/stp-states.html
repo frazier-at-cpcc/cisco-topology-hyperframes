@@ -18,11 +18,11 @@
     <svg class="topo" viewBox="0 0 1920 1080" width="1920" height="1080" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><defs><symbol id="icon-router" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="#1f6fb2" stroke="#0d3c61" stroke-width="3"/><path d="M30 50h40M50 30v40M38 38l24 24M62 38L38 62" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round"/></symbol>
 <symbol id="icon-switch" viewBox="0 0 100 100"><rect x="15" y="30" width="70" height="40" rx="6" fill="#2c8a3d" stroke="#14431d" stroke-width="3"/><path d="M25 50h50M62 42l14 8-14 8M38 58L24 50l14-8" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol></defs>
 <line id="link-l1" x1="252" y1="232" x2="232" y2="492" class="link link-ethernet" stroke-dasharray="261" style="--dash:0" />
-<line id="link-l1-state" x1="252" y1="232" x2="232" y2="492" class="link-state" opacity="0" />
+<line id="link-l1-state" x1="252" y1="232" x2="232" y2="492" class="link-state" stroke-width="6" opacity="0" />
 <line id="link-l2" x1="252" y1="232" x2="252" y2="752" class="link link-ethernet" stroke-dasharray="520" style="--dash:0" />
-<line id="link-l2-state" x1="252" y1="232" x2="252" y2="752" class="link-state" opacity="0" />
+<line id="link-l2-state" x1="252" y1="232" x2="252" y2="752" class="link-state" stroke-width="6" opacity="0" />
 <line id="link-l3" x1="232" y1="492" x2="252" y2="752" class="link link-ethernet" stroke-dasharray="261" style="--dash:0" />
-<line id="link-l3-state" x1="232" y1="492" x2="252" y2="752" class="link-state" opacity="0" />
+<line id="link-l3-state" x1="232" y1="492" x2="252" y2="752" class="link-state" stroke-width="6" opacity="0" />
 <g id="node-R1" class="node" transform="translate(252,232)"><circle id="node-R1-state" class="node-state" cx="0" cy="0" r="62" fill="none" stroke-width="6" opacity="0" /><use href="#icon-router" x="-48" y="-48" width="96" height="96" /><text class="node-label" x="0" y="76">Root</text></g>
 <g id="node-SW1" class="node" transform="translate(232,492)"><circle id="node-SW1-state" class="node-state" cx="0" cy="0" r="62" fill="none" stroke-width="6" opacity="0" /><use href="#icon-switch" x="-48" y="-48" width="96" height="96" /><text class="node-label" x="0" y="76">SW1</text></g>
 <g id="node-SW2" class="node" transform="translate(252,752)"><circle id="node-SW2-state" class="node-state" cx="0" cy="0" r="62" fill="none" stroke-width="6" opacity="0" /><use href="#icon-switch" x="-48" y="-48" width="96" height="96" /><text class="node-label" x="0" y="76">SW2</text></g>
@@ -61,8 +61,20 @@
           var el = root.querySelector(op.selector);
           if (el) { tl.set(el, { stroke: op.color }, op.at); tl.to(el, { opacity: op.opacity, duration: op.duration }, op.at); }
           else console.warn('cisco-topology: no element for ' + op.selector);
+        } else if (op.kind === 'badge') {
+          var bg = document.createElementNS(SVGNS, 'g');
+          var s = op.size || 16;
+          [[-s, -s, s, s], [-s, s, s, -s]].forEach(function (co) {
+            var ln = document.createElementNS(SVGNS, 'line');
+            ln.setAttribute('x1', co[0]); ln.setAttribute('y1', co[1]); ln.setAttribute('x2', co[2]); ln.setAttribute('y2', co[3]);
+            ln.setAttribute('stroke', op.color); ln.setAttribute('stroke-width', 6); ln.setAttribute('stroke-linecap', 'round');
+            bg.appendChild(ln);
+          });
+          bg.setAttribute('opacity', '0'); svg.appendChild(bg);
+          gsap.set(bg, { x: op.point[0], y: op.point[1] }); // park at op.point immediately, same rationale as the flow packet park-on-creation
+          tl.set(bg, { x: op.point[0], y: op.point[1] }, op.at);
+          tl.to(bg, { opacity: 1, duration: op.duration }, op.at);
         }
-        // badge kind is added in Task 8
       });
       window.__timelines["stp-states"] = tl;
     })();

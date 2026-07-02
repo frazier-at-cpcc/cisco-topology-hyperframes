@@ -19,12 +19,15 @@
 <symbol id="icon-switch" viewBox="0 0 100 100"><rect x="15" y="30" width="70" height="40" rx="6" fill="#2c8a3d" stroke="#14431d" stroke-width="3"/><path d="M25 50h50M62 42l14 8-14 8M38 58L24 50l14-8" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
 <symbol id="icon-pc" viewBox="0 0 100 100"><rect x="20" y="25" width="60" height="38" rx="3" fill="#334" stroke="#111" stroke-width="3"/><rect x="26" y="31" width="48" height="26" fill="#8fd3ff"/><path d="M40 70h20l4 8H36z" fill="#556"/></symbol></defs>
 <line id="link-l1" x1="232" y1="212" x2="232" y2="472" class="link link-ethernet" stroke-dasharray="260" style="--dash:0" />
+<line id="link-l1-state" x1="232" y1="212" x2="232" y2="472" class="link-state" stroke-width="6" opacity="0" />
 <line id="link-l2" x1="232" y1="472" x2="212" y2="732" class="link link-ethernet" stroke-dasharray="261" style="--dash:0" />
+<line id="link-l2-state" x1="232" y1="472" x2="212" y2="732" class="link-state" stroke-width="6" opacity="0" />
 <line id="link-l3" x1="232" y1="472" x2="422" y2="732" class="link link-ethernet" stroke-dasharray="322" style="--dash:0" />
-<g id="node-R1" class="node" transform="translate(232,212)"><use href="#icon-router" x="-48" y="-48" width="96" height="96" /><text class="node-label" x="0" y="76">R1</text></g>
-<g id="node-SW1" class="node" transform="translate(232,472)"><use href="#icon-switch" x="-48" y="-48" width="96" height="96" /><text class="node-label" x="0" y="76">SW1</text></g>
-<g id="node-A" class="node" transform="translate(212,732)"><use href="#icon-pc" x="-48" y="-48" width="96" height="96" /><text class="node-label" x="0" y="76">PC-A</text></g>
-<g id="node-B" class="node" transform="translate(422,732)"><use href="#icon-pc" x="-48" y="-48" width="96" height="96" /><text class="node-label" x="0" y="76">PC-B</text></g>
+<line id="link-l3-state" x1="232" y1="472" x2="422" y2="732" class="link-state" stroke-width="6" opacity="0" />
+<g id="node-R1" class="node" transform="translate(232,212)"><circle id="node-R1-state" class="node-state" cx="0" cy="0" r="62" fill="none" stroke-width="6" opacity="0" /><use href="#icon-router" x="-48" y="-48" width="96" height="96" /><text class="node-label" x="0" y="76">R1</text></g>
+<g id="node-SW1" class="node" transform="translate(232,472)"><circle id="node-SW1-state" class="node-state" cx="0" cy="0" r="62" fill="none" stroke-width="6" opacity="0" /><use href="#icon-switch" x="-48" y="-48" width="96" height="96" /><text class="node-label" x="0" y="76">SW1</text></g>
+<g id="node-A" class="node" transform="translate(212,732)"><circle id="node-A-state" class="node-state" cx="0" cy="0" r="62" fill="none" stroke-width="6" opacity="0" /><use href="#icon-pc" x="-48" y="-48" width="96" height="96" /><text class="node-label" x="0" y="76">PC-A</text></g>
+<g id="node-B" class="node" transform="translate(422,732)"><circle id="node-B-state" class="node-state" cx="0" cy="0" r="62" fill="none" stroke-width="6" opacity="0" /><use href="#icon-pc" x="-48" y="-48" width="96" height="96" /><text class="node-label" x="0" y="76">PC-B</text></g>
 </svg>
   </div>
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
@@ -56,8 +59,24 @@
             t += op.hopDur;
           }
           tl.to(g, { opacity: 0, duration: 0.2 }, t);
+        } else if (op.kind === 'set-state') {
+          var el = root.querySelector(op.selector);
+          if (el) { tl.set(el, { stroke: op.color }, op.at); tl.to(el, { opacity: op.opacity, duration: op.duration }, op.at); }
+          else console.warn('cisco-topology: no element for ' + op.selector);
+        } else if (op.kind === 'badge') {
+          var bg = document.createElementNS(SVGNS, 'g');
+          var s = op.size || 16;
+          [[-s, -s, s, s], [-s, s, s, -s]].forEach(function (co) {
+            var ln = document.createElementNS(SVGNS, 'line');
+            ln.setAttribute('x1', co[0]); ln.setAttribute('y1', co[1]); ln.setAttribute('x2', co[2]); ln.setAttribute('y2', co[3]);
+            ln.setAttribute('stroke', op.color); ln.setAttribute('stroke-width', 6); ln.setAttribute('stroke-linecap', 'round');
+            bg.appendChild(ln);
+          });
+          bg.setAttribute('opacity', '0'); svg.appendChild(bg);
+          gsap.set(bg, { x: op.point[0], y: op.point[1] }); // park at op.point immediately, same rationale as the flow packet park-on-creation
+          tl.set(bg, { x: op.point[0], y: op.point[1] }, op.at);
+          tl.to(bg, { opacity: 1, duration: op.duration }, op.at);
         }
-        // set-state and badge kinds are added in Tasks 6 and 8
       });
       window.__timelines["ping-flow"] = tl;
     })();

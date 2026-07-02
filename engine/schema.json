@@ -61,11 +61,13 @@
           "target": { "type": "string" },
           "mode": { "type": "string" },
           "path": { "type": "array", "items": { "type": "string" } },
+          "paths": { "type": "array", "items": { "type": "array", "items": { "type": "string" } } },
           "label": { "type": "string" },
           "kind": { "type": "string" },
           "state": { "type": "string" },
           "reroute": { "type": "array", "items": { "type": "string" } }
-        }
+        },
+        "additionalProperties": false
       }
     }
   }

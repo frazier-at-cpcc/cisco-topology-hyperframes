@@ -24,6 +24,11 @@ export function validateTopology(topo) {
     for (const id of ev.path || []) {
       if (!nodeIds.has(id)) errors.push(`event @${ev.at}: unknown path node '${id}'`);
     }
+    for (const p of ev.paths || []) {
+      for (const id of p) {
+        if (!nodeIds.has(id)) errors.push(`event @${ev.at}: unknown paths node '${id}'`);
+      }
+    }
     for (const id of ev.reroute || []) {
       if (!nodeIds.has(id)) errors.push(`event @${ev.at}: unknown reroute node '${id}'`);
     }
