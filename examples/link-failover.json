@@ -1,0 +1,32 @@
+{
+  "canvas": { "width": 1920, "height": 1080, "padding": 140 },
+  "layout": { "algorithm": "layered", "direction": "DOWN", "seed": 1 },
+  "nodes": [
+    { "id": "A", "type": "pc", "label": "PC-A" },
+    { "id": "SW1", "type": "switch", "label": "SW1" },
+    { "id": "R1", "type": "router", "label": "R1 (primary)" },
+    { "id": "R2", "type": "router", "label": "R2 (backup)" },
+    { "id": "B", "type": "pc", "label": "PC-B" }
+  ],
+  "links": [
+    { "id": "a1", "from": "A", "to": "SW1" },
+    { "id": "p1", "from": "SW1", "to": "R1" },
+    { "id": "p2", "from": "R1", "to": "B" },
+    { "id": "b1", "from": "SW1", "to": "R2" },
+    { "id": "b2", "from": "R2", "to": "B" }
+  ],
+  "events": [
+    { "at": 0.2, "type": "reveal", "target": "A" },
+    { "at": 0.5, "type": "reveal", "target": "SW1" },
+    { "at": 0.8, "type": "reveal", "target": "R1" },
+    { "at": 1.1, "type": "reveal", "target": "R2" },
+    { "at": 1.4, "type": "reveal", "target": "B" },
+    { "at": 1.7, "type": "reveal", "target": "a1", "mode": "draw" },
+    { "at": 1.9, "type": "reveal", "target": "p1", "mode": "draw" },
+    { "at": 2.1, "type": "reveal", "target": "p2", "mode": "draw" },
+    { "at": 2.3, "type": "reveal", "target": "b1", "mode": "draw" },
+    { "at": 2.5, "type": "reveal", "target": "b2", "mode": "draw" },
+    { "at": 3.0, "type": "flow", "path": ["A", "SW1", "R1", "B"], "kind": "unicast", "label": "primary path" },
+    { "at": 5.2, "type": "fail", "target": "p1", "reroute": ["A", "SW1", "R2", "B"] }
+  ]
+}

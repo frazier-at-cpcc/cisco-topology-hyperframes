@@ -1,0 +1,91 @@
+<!doctype html>
+<html>
+<head><meta charset="UTF-8" /></head>
+<body>
+<template>
+  <style>
+    #link-failover { position: absolute; inset: 0; background: #0b1622; overflow: hidden; }
+    #link-failover .topo { position: absolute; inset: 0; width: 100%; height: 100%; }
+    #link-failover .link { stroke: #7fa8c9; stroke-width: 4; stroke-dashoffset: var(--dash, 0); }
+    #link-failover .link-trunk { stroke-width: 7; }
+    #link-failover .link-wireless { stroke-dasharray: 10 8; }
+    #link-failover .link-label, #link-failover .node-label {
+      fill: #cfe0ee; font-family: 'Segoe UI', sans-serif; font-size: 22px; text-anchor: middle;
+    }
+    #link-failover .node-label { font-weight: 600; }
+  </style>
+  <div id="link-failover" data-composition-id="link-failover" data-width="1920" data-height="1080" data-duration="8">
+    <svg class="topo" viewBox="0 0 1920 1080" width="1920" height="1080" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><defs><symbol id="icon-pc" viewBox="0 0 100 100"><rect x="20" y="25" width="60" height="38" rx="3" fill="#334" stroke="#111" stroke-width="3"/><rect x="26" y="31" width="48" height="26" fill="#8fd3ff"/><path d="M40 70h20l4 8H36z" fill="#556"/></symbol>
+<symbol id="icon-switch" viewBox="0 0 100 100"><rect x="15" y="30" width="70" height="40" rx="6" fill="#2c8a3d" stroke="#14431d" stroke-width="3"/><path d="M25 50h50M62 42l14 8-14 8M38 58L24 50l14-8" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="icon-router" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="#1f6fb2" stroke="#0d3c61" stroke-width="3"/><path d="M30 50h40M50 30v40M38 38l24 24M62 38L38 62" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round"/></symbol></defs>
+<line id="link-a1" x1="232" y1="212" x2="232" y2="472" class="link link-ethernet" stroke-dasharray="260" style="--dash:0" />
+<line id="link-a1-state" x1="232" y1="212" x2="232" y2="472" class="link-state" opacity="0" />
+<line id="link-p1" x1="232" y1="472" x2="422" y2="732" class="link link-ethernet" stroke-dasharray="322" style="--dash:0" />
+<line id="link-p1-state" x1="232" y1="472" x2="422" y2="732" class="link-state" opacity="0" />
+<line id="link-p2" x1="422" y1="732" x2="232" y2="992" class="link link-ethernet" stroke-dasharray="322" style="--dash:0" />
+<line id="link-p2-state" x1="422" y1="732" x2="232" y2="992" class="link-state" opacity="0" />
+<line id="link-b1" x1="232" y1="472" x2="212" y2="732" class="link link-ethernet" stroke-dasharray="261" style="--dash:0" />
+<line id="link-b1-state" x1="232" y1="472" x2="212" y2="732" class="link-state" opacity="0" />
+<line id="link-b2" x1="212" y1="732" x2="232" y2="992" class="link link-ethernet" stroke-dasharray="261" style="--dash:0" />
+<line id="link-b2-state" x1="212" y1="732" x2="232" y2="992" class="link-state" opacity="0" />
+<g id="node-A" class="node" transform="translate(232,212)"><circle id="node-A-state" class="node-state" cx="0" cy="0" r="62" fill="none" stroke-width="6" opacity="0" /><use href="#icon-pc" x="-48" y="-48" width="96" height="96" /><text class="node-label" x="0" y="76">PC-A</text></g>
+<g id="node-SW1" class="node" transform="translate(232,472)"><circle id="node-SW1-state" class="node-state" cx="0" cy="0" r="62" fill="none" stroke-width="6" opacity="0" /><use href="#icon-switch" x="-48" y="-48" width="96" height="96" /><text class="node-label" x="0" y="76">SW1</text></g>
+<g id="node-R1" class="node" transform="translate(422,732)"><circle id="node-R1-state" class="node-state" cx="0" cy="0" r="62" fill="none" stroke-width="6" opacity="0" /><use href="#icon-router" x="-48" y="-48" width="96" height="96" /><text class="node-label" x="0" y="76">R1 (primary)</text></g>
+<g id="node-R2" class="node" transform="translate(212,732)"><circle id="node-R2-state" class="node-state" cx="0" cy="0" r="62" fill="none" stroke-width="6" opacity="0" /><use href="#icon-router" x="-48" y="-48" width="96" height="96" /><text class="node-label" x="0" y="76">R2 (backup)</text></g>
+<g id="node-B" class="node" transform="translate(232,992)"><circle id="node-B-state" class="node-state" cx="0" cy="0" r="62" fill="none" stroke-width="6" opacity="0" /><use href="#icon-pc" x="-48" y="-48" width="96" height="96" /><text class="node-label" x="0" y="76">PC-B</text></g>
+</svg>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+  <script>
+    (function () {
+      window.__timelines = window.__timelines || {};
+      var TWEENS = [{"at":0.2,"selector":"#node-A","kind":"reveal-node","from":{"opacity":0,"scale":0.6},"to":{"opacity":1,"scale":1,"duration":0.5,"ease":"back.out(1.6)"}},{"at":0.5,"selector":"#node-SW1","kind":"reveal-node","from":{"opacity":0,"scale":0.6},"to":{"opacity":1,"scale":1,"duration":0.5,"ease":"back.out(1.6)"}},{"at":0.8,"selector":"#node-R1","kind":"reveal-node","from":{"opacity":0,"scale":0.6},"to":{"opacity":1,"scale":1,"duration":0.5,"ease":"back.out(1.6)"}},{"at":1.1,"selector":"#node-R2","kind":"reveal-node","from":{"opacity":0,"scale":0.6},"to":{"opacity":1,"scale":1,"duration":0.5,"ease":"back.out(1.6)"}},{"at":1.4,"selector":"#node-B","kind":"reveal-node","from":{"opacity":0,"scale":0.6},"to":{"opacity":1,"scale":1,"duration":0.5,"ease":"back.out(1.6)"}},{"at":1.7,"selector":"#link-a1","kind":"reveal-link-draw","from":{"--dash":260},"to":{"--dash":0,"duration":0.6,"ease":"power2.out"}},{"at":1.9,"selector":"#link-p1","kind":"reveal-link-draw","from":{"--dash":322},"to":{"--dash":0,"duration":0.6,"ease":"power2.out"}},{"at":2.1,"selector":"#link-p2","kind":"reveal-link-draw","from":{"--dash":322},"to":{"--dash":0,"duration":0.6,"ease":"power2.out"}},{"at":2.3,"selector":"#link-b1","kind":"reveal-link-draw","from":{"--dash":261},"to":{"--dash":0,"duration":0.6,"ease":"power2.out"}},{"at":2.5,"selector":"#link-b2","kind":"reveal-link-draw","from":{"--dash":261},"to":{"--dash":0,"duration":0.6,"ease":"power2.out"}},{"at":3,"kind":"flow","points":[[232,212],[232,472],[422,732],[232,992]],"hopDur":0.2,"color":"#0066ff","r":8},{"at":5.2,"kind":"set-state","selector":"#link-p1-state","color":"#cc0000","opacity":0.95,"duration":0.3},{"at":5.2,"kind":"badge","point":[327,602],"color":"#cc0000","size":18,"duration":0.3},{"at":5.6000000000000005,"kind":"flow","points":[[232,212],[232,472],[212,732],[232,992]],"hopDur":0.2,"color":"#0066ff","r":8}];
+      var root = document.getElementById('link-failover');
+      var tl = gsap.timeline({ paused: true });
+      var SVGNS = 'http://www.w3.org/2000/svg';
+      var svg = root.querySelector('svg');
+      TWEENS.forEach(function (op) {
+        if (op.kind === 'reveal-node' || op.kind === 'reveal-link-draw' || op.kind === 'reveal-link-fade') {
+          var el = root.querySelector(op.selector);
+          if (el) tl.fromTo(el, op.from, Object.assign({}, op.to), op.at);
+          else console.warn('cisco-topology: no element for ' + op.selector);
+        } else if (op.kind === 'flow') {
+          var g = document.createElementNS(SVGNS, 'g');
+          var c = document.createElementNS(SVGNS, 'circle');
+          c.setAttribute('r', op.r); c.setAttribute('cx', 0); c.setAttribute('cy', 0); c.setAttribute('fill', op.color);
+          g.appendChild(c); g.setAttribute('opacity', '0'); svg.appendChild(g);
+          var p0 = op.points[0];
+          gsap.set(g, { x: p0[0], y: p0[1] }); // park on-canvas at the path start immediately, so pre-op.at seeks never see the raw (0,0) origin default
+          tl.set(g, { x: p0[0], y: p0[1], opacity: 0 }, op.at);
+          tl.to(g, { opacity: 1, duration: 0.2 }, op.at);
+          var t = op.at + 0.2;
+          for (var i = 1; i < op.points.length; i++) {
+            tl.to(g, { x: op.points[i][0], y: op.points[i][1], duration: op.hopDur, ease: 'none' }, t);
+            t += op.hopDur;
+          }
+          tl.to(g, { opacity: 0, duration: 0.2 }, t);
+        } else if (op.kind === 'set-state') {
+          var el = root.querySelector(op.selector);
+          if (el) { tl.set(el, { stroke: op.color }, op.at); tl.to(el, { opacity: op.opacity, duration: op.duration }, op.at); }
+          else console.warn('cisco-topology: no element for ' + op.selector);
+        } else if (op.kind === 'badge') {
+          var bg = document.createElementNS(SVGNS, 'g');
+          var s = op.size || 16;
+          [[-s, -s, s, s], [-s, s, s, -s]].forEach(function (co) {
+            var ln = document.createElementNS(SVGNS, 'line');
+            ln.setAttribute('x1', co[0]); ln.setAttribute('y1', co[1]); ln.setAttribute('x2', co[2]); ln.setAttribute('y2', co[3]);
+            ln.setAttribute('stroke', op.color); ln.setAttribute('stroke-width', 6); ln.setAttribute('stroke-linecap', 'round');
+            bg.appendChild(ln);
+          });
+          bg.setAttribute('opacity', '0'); svg.appendChild(bg);
+          gsap.set(bg, { x: op.point[0], y: op.point[1] }); // park at op.point immediately, same rationale as the flow packet park-on-creation
+          tl.set(bg, { x: op.point[0], y: op.point[1] }, op.at);
+          tl.to(bg, { opacity: 1, duration: op.duration }, op.at);
+        }
+      });
+      window.__timelines["link-failover"] = tl;
+    })();
+  </script>
+</template>
+</body>
+</html>

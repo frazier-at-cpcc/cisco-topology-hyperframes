@@ -117,3 +117,20 @@ test('runtime handles set-state via instantaneous stroke set + opacity fade', as
   assert.match(html, /tl\.set\([^;]*stroke:\s*op\.color/);            // color is set, not tweened
   assert.match(html, /tl\.to\([^;]*opacity:\s*op\.opacity/);          // then faded in
 });
+
+test('runtime creates an X badge for a fail event', async () => {
+  const topo = {
+    nodes: [ { id: 'SW1', type: 'switch', x: 0, y: 100 }, { id: 'R1', type: 'router', x: 0, y: 300 } ],
+    links: [ { id: 'l1', from: 'SW1', to: 'R1' } ],
+    events: [ { at: 2, type: 'fail', target: 'l1' } ]
+  };
+  const html = await buildBlock(topo, { id: 'fail-demo' });
+  // NOTE: the brief's literal assertions (/'badge'|"badge"/ and /createElementNS/) already
+  // false-pass pre-implementation — 'badge' appears in the JSON-embedded TWEENS payload
+  // (planTimeline already emits a badge op for 'fail'), and createElementNS already exists
+  // in the flow branch. Tightened to target the actual runtime switch branch, per the
+  // hollow-test lesson from Tasks 2 and 6.
+  assert.match(html, /op\.kind\s*===\s*'badge'/);                       // the switch handles badge
+  assert.match(html, /createElementNS\(SVGNS,\s*['"]line['"]\)/);       // crossed lines built via createElementNS
+  assert.ok(!/\.innerHTML\s*=/.test(html), 'must not use innerHTML on SVG');
+});

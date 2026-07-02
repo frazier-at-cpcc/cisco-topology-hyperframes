@@ -62,8 +62,20 @@ export function blockHtml({ id, svg, tweens, width, height, duration }) {
           var el = root.querySelector(op.selector);
           if (el) { tl.set(el, { stroke: op.color }, op.at); tl.to(el, { opacity: op.opacity, duration: op.duration }, op.at); }
           else console.warn('cisco-topology: no element for ' + op.selector);
+        } else if (op.kind === 'badge') {
+          var bg = document.createElementNS(SVGNS, 'g');
+          var s = op.size || 16;
+          [[-s, -s, s, s], [-s, s, s, -s]].forEach(function (co) {
+            var ln = document.createElementNS(SVGNS, 'line');
+            ln.setAttribute('x1', co[0]); ln.setAttribute('y1', co[1]); ln.setAttribute('x2', co[2]); ln.setAttribute('y2', co[3]);
+            ln.setAttribute('stroke', op.color); ln.setAttribute('stroke-width', 6); ln.setAttribute('stroke-linecap', 'round');
+            bg.appendChild(ln);
+          });
+          bg.setAttribute('opacity', '0'); svg.appendChild(bg);
+          gsap.set(bg, { x: op.point[0], y: op.point[1] }); // park at op.point immediately, same rationale as the flow packet park-on-creation
+          tl.set(bg, { x: op.point[0], y: op.point[1] }, op.at);
+          tl.to(bg, { opacity: 1, duration: op.duration }, op.at);
         }
-        // badge kind is added in Task 8
       });
       window.__timelines["${id}"] = tl;
     })();
