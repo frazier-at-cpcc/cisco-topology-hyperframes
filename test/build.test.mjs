@@ -61,3 +61,28 @@ test('pins the gsap CDN version', async () => {
   const html = await buildBlock(topo, { id: 'cisco-topology-demo' });
   assert.match(html, /gsap@3\.14\.2/);
 });
+
+test('runtime creates an SVG packet for a flow op', async () => {
+  const topo = {
+    nodes: [ { id: 'A', type: 'pc', x: 100, y: 400 }, { id: 'B', type: 'pc', x: 500, y: 400 } ],
+    links: [ { id: 'l1', from: 'A', to: 'B' } ],
+    events: [ { at: 1.0, type: 'flow', path: ['A', 'B'], kind: 'unicast' } ]
+  };
+  const html = await buildBlock(topo, { id: 'flow-demo' });
+  assert.match(html, /createElementNS/);             // packet is created, not innerHTML'd
+  assert.match(html, /appendChild/);
+  assert.match(html, /'flow'|"flow"/);               // the switch handles flow
+});
+
+test('duration extends past a late flow op end, not just the event at', async () => {
+  // single flow at t=5 over a 3-hop path (2 hops * 0.6 = 1.2) + fades => ends ~6.6; duration must be >= 7
+  const topo = {
+    nodes: [ { id: 'A', type: 'pc', x: 0, y: 0 }, { id: 'B', type: 'pc', x: 100, y: 0 }, { id: 'C', type: 'pc', x: 200, y: 0 } ],
+    links: [ { id: 'l1', from: 'A', to: 'B' }, { id: 'l2', from: 'B', to: 'C' } ],
+    events: [ { at: 5.0, type: 'flow', path: ['A', 'B', 'C'], kind: 'unicast' } ]
+  };
+  const html = await buildBlock(topo, { id: 'dur-demo' });
+  const m = html.match(/data-duration="(\d+)"/);
+  assert.ok(m, 'data-duration present');
+  assert.ok(Number(m[1]) >= 7, `expected duration >= 7, got ${m[1]}`);
+});

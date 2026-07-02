@@ -36,10 +36,29 @@ export function blockHtml({ id, svg, tweens, width, height, duration }) {
       var TWEENS = ${tweensJson};
       var root = document.getElementById('${id}');
       var tl = gsap.timeline({ paused: true });
-      TWEENS.forEach(function (tw) {
-        var el = root.querySelector(tw.selector);
-        if (el) { tl.fromTo(el, tw.from, Object.assign({}, tw.to), tw.at); }
-        else { console.warn('cisco-topology: no element for ' + tw.selector); }
+      var SVGNS = 'http://www.w3.org/2000/svg';
+      var svg = root.querySelector('svg');
+      TWEENS.forEach(function (op) {
+        if (op.kind === 'reveal-node' || op.kind === 'reveal-link-draw' || op.kind === 'reveal-link-fade') {
+          var el = root.querySelector(op.selector);
+          if (el) tl.fromTo(el, op.from, Object.assign({}, op.to), op.at);
+          else console.warn('cisco-topology: no element for ' + op.selector);
+        } else if (op.kind === 'flow') {
+          var g = document.createElementNS(SVGNS, 'g');
+          var c = document.createElementNS(SVGNS, 'circle');
+          c.setAttribute('r', op.r); c.setAttribute('cx', 0); c.setAttribute('cy', 0); c.setAttribute('fill', op.color);
+          g.appendChild(c); g.setAttribute('opacity', '0'); svg.appendChild(g);
+          var p0 = op.points[0];
+          tl.set(g, { x: p0[0], y: p0[1], opacity: 0 }, op.at);
+          tl.to(g, { opacity: 1, duration: 0.2 }, op.at);
+          var t = op.at + 0.2;
+          for (var i = 1; i < op.points.length; i++) {
+            tl.to(g, { x: op.points[i][0], y: op.points[i][1], duration: op.hopDur, ease: 'none' }, t);
+            t += op.hopDur;
+          }
+          tl.to(g, { opacity: 0, duration: 0.2 }, t);
+        }
+        // set-state and badge kinds are added in Tasks 6 and 8
       });
       window.__timelines["${id}"] = tl;
     })();
@@ -49,14 +68,20 @@ export function blockHtml({ id, svg, tweens, width, height, duration }) {
 </html>`;
 }
 
+function opEndTime(op) {
+  if (op.kind === 'flow') return op.at + 0.2 + Math.max(0, op.points.length - 1) * op.hopDur + 0.2;
+  if (op.kind === 'set-state' || op.kind === 'badge') return op.at + (op.duration || 0.4);
+  return op.at + ((op.to && op.to.duration) || 0.6); // reveal-*
+}
+
 export async function buildBlock(topo, { id }) {
   const v = validateTopology(topo);
   if (!v.valid) throw new Error('Invalid topology:\n' + v.errors.join('\n'));
   const laid = await applyLayout(topo);
   const svg = renderSvg(laid);
   const tweens = planTimeline(laid);
-  const lastAt = (laid.events || []).reduce((m, e) => Math.max(m, e.at), 0);
-  const duration = Math.max(3, Math.ceil(lastAt + 1.5));
+  const maxEnd = (tweens.length ? Math.max(...tweens.map(opEndTime)) : 0);
+  const duration = Math.max(3, Math.ceil(maxEnd + 0.5));
   return blockHtml({ id, svg, tweens, width: laid.canvas.width, height: laid.canvas.height, duration });
 }
 
