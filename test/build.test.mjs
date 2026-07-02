@@ -75,14 +75,33 @@ test('runtime creates an SVG packet for a flow op', async () => {
 });
 
 test('duration extends past a late flow op end, not just the event at', async () => {
-  // single flow at t=5 over a 3-hop path (2 hops * 0.6 = 1.2) + fades => ends ~6.6; duration must be >= 7
+  // single flow at t=5 over an 8-node linear path (7 hops * 0.2 = 1.4) + fades
+  // opEndTime = 5.0 + 0.2 + 1.4 + 0.2 = 6.8 => duration = ceil(6.8 + 0.5) = 8
+  // (old formula ceil(5.0 + 1.5) = 7 would miss the actual end time)
   const topo = {
-    nodes: [ { id: 'A', type: 'pc', x: 0, y: 0 }, { id: 'B', type: 'pc', x: 100, y: 0 }, { id: 'C', type: 'pc', x: 200, y: 0 } ],
-    links: [ { id: 'l1', from: 'A', to: 'B' }, { id: 'l2', from: 'B', to: 'C' } ],
-    events: [ { at: 5.0, type: 'flow', path: ['A', 'B', 'C'], kind: 'unicast' } ]
+    nodes: [
+      { id: 'n0', type: 'pc', x: 0, y: 0 },
+      { id: 'n1', type: 'pc', x: 100, y: 0 },
+      { id: 'n2', type: 'pc', x: 200, y: 0 },
+      { id: 'n3', type: 'pc', x: 300, y: 0 },
+      { id: 'n4', type: 'pc', x: 400, y: 0 },
+      { id: 'n5', type: 'pc', x: 500, y: 0 },
+      { id: 'n6', type: 'pc', x: 600, y: 0 },
+      { id: 'n7', type: 'pc', x: 700, y: 0 }
+    ],
+    links: [
+      { id: 'l1', from: 'n0', to: 'n1' },
+      { id: 'l2', from: 'n1', to: 'n2' },
+      { id: 'l3', from: 'n2', to: 'n3' },
+      { id: 'l4', from: 'n3', to: 'n4' },
+      { id: 'l5', from: 'n4', to: 'n5' },
+      { id: 'l6', from: 'n5', to: 'n6' },
+      { id: 'l7', from: 'n6', to: 'n7' }
+    ],
+    events: [ { at: 5.0, type: 'flow', path: ['n0', 'n1', 'n2', 'n3', 'n4', 'n5', 'n6', 'n7'], kind: 'unicast' } ]
   };
   const html = await buildBlock(topo, { id: 'dur-demo' });
   const m = html.match(/data-duration="(\d+)"/);
   assert.ok(m, 'data-duration present');
-  assert.ok(Number(m[1]) >= 7, `expected duration >= 7, got ${m[1]}`);
+  assert.equal(Number(m[1]), 8, `expected duration === 8, got ${m[1]}`);
 });
