@@ -15,12 +15,12 @@ export const STATE_STYLES = {
   active: { color: '#0066ff', opacity: 0.9 },
   standby: { color: '#999999', opacity: 0.8 },
   selected: { color: '#ffffff', opacity: 0.9 },
-  up: { opacity: 0 }
+  up: { color: '#2ec16b', opacity: 0 }
 };
 
 function stateSelector(target, nodeById, linkById) {
-  if (linkById.has(target)) return `#link-${target}-state`;
   if (nodeById.has(target)) return `#node-${target}-state`;
+  if (linkById.has(target)) return `#link-${target}-state`;
   return null;
 }
 

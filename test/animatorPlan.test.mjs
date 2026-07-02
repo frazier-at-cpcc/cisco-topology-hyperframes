@@ -83,3 +83,16 @@ test('unknown state is skipped, not crashed', () => {
     events: [ { at: 1, type: 'setState', target: 'R1', state: 'bogus' } ] };
   assert.equal(planTimeline(t).filter(o => o.kind === 'set-state').length, 0);
 });
+
+test('STATE_STYLES.up has both color and opacity keys (opacity 0 clears)', () => {
+  assert.equal(typeof STATE_STYLES.up.color, 'string');
+  assert.equal(STATE_STYLES.up.opacity, 0);
+});
+
+test('setState -> up emits a set-state op with opacity 0', () => {
+  const t = { nodes: [ { id: 'R1', type: 'router', x: 0, y: 0 } ], links: [],
+    events: [ { at: 1, type: 'setState', target: 'R1', state: 'up' } ] };
+  const op = planTimeline(t).find(o => o.kind === 'set-state');
+  assert.equal(op.opacity, 0);
+  assert.equal(typeof op.color, 'string');
+});
