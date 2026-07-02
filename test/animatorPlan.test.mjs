@@ -96,3 +96,32 @@ test('setState -> up emits a set-state op with opacity 0', () => {
   assert.equal(op.opacity, 0);
   assert.equal(typeof op.color, 'string');
 });
+
+test('fail on a link → set-state(down) + badge at link midpoint (+ reroute flow)', () => {
+  const t = {
+    nodes: [ { id: 'A', type: 'pc', x: 0, y: 0 }, { id: 'SW1', type: 'switch', x: 0, y: 200 },
+             { id: 'R1', type: 'router', x: 0, y: 400 }, { id: 'R2', type: 'router', x: 200, y: 400 }, { id: 'B', type: 'pc', x: 200, y: 0 } ],
+    links: [ { id: 'l1', from: 'SW1', to: 'R1' } ],
+    events: [ { at: 5, type: 'fail', target: 'l1', reroute: ['A', 'SW1', 'R2', 'B'] } ]
+  };
+  const ops = planTimeline(t);
+  const ss = ops.find(o => o.kind === 'set-state');
+  assert.equal(ss.selector, '#link-l1-state');
+  assert.equal(ss.color, STATE_STYLES.down.color);
+  const badge = ops.find(o => o.kind === 'badge');
+  assert.deepEqual(badge.point, [0, 300]);   // midpoint of SW1(0,200) and R1(0,400)
+  const flow = ops.find(o => o.kind === 'flow');
+  assert.ok(flow.at >= 5.4);
+  assert.equal(flow.points.length, 4);
+});
+
+test('fail with no reroute emits set-state + badge only', () => {
+  const t = {
+    nodes: [ { id: 'X', type: 'server', x: 10, y: 20 } ], links: [],
+    events: [ { at: 2, type: 'fail', target: 'X' } ]
+  };
+  const ops = planTimeline(t);
+  assert.equal(ops.filter(o => o.kind === 'flow').length, 0);
+  assert.equal(ops.find(o => o.kind === 'badge').point[0], 10);
+  assert.equal(ops.find(o => o.kind === 'set-state').selector, '#node-X-state');
+});
