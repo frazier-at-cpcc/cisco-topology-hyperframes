@@ -1,0 +1,26 @@
+{
+  "canvas": { "width": 1920, "height": 1080, "padding": 160 },
+  "layout": { "algorithm": "layered", "direction": "DOWN", "seed": 1 },
+  "nodes": [
+    { "id": "R1", "type": "router", "label": "Root" },
+    { "id": "SW1", "type": "switch", "label": "SW1" },
+    { "id": "SW2", "type": "switch", "label": "SW2" }
+  ],
+  "links": [
+    { "id": "l1", "from": "R1", "to": "SW1" },
+    { "id": "l2", "from": "R1", "to": "SW2" },
+    { "id": "l3", "from": "SW1", "to": "SW2" }
+  ],
+  "events": [
+    { "at": 0.2, "type": "reveal", "target": "R1" },
+    { "at": 0.6, "type": "reveal", "target": "SW1" },
+    { "at": 0.9, "type": "reveal", "target": "SW2" },
+    { "at": 1.2, "type": "reveal", "target": "l1", "mode": "draw" },
+    { "at": 1.5, "type": "reveal", "target": "l2", "mode": "draw" },
+    { "at": 1.8, "type": "reveal", "target": "l3", "mode": "draw" },
+    { "at": 2.6, "type": "setState", "target": "R1", "state": "active" },
+    { "at": 3.0, "type": "setState", "target": "l1", "state": "forwarding" },
+    { "at": 3.4, "type": "setState", "target": "l2", "state": "forwarding" },
+    { "at": 3.8, "type": "setState", "target": "l3", "state": "blocking" }
+  ]
+}

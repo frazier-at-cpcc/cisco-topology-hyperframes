@@ -1,0 +1,72 @@
+<!doctype html>
+<html>
+<head><meta charset="UTF-8" /></head>
+<body>
+<template>
+  <style>
+    #stp-states { position: absolute; inset: 0; background: #0b1622; overflow: hidden; }
+    #stp-states .topo { position: absolute; inset: 0; width: 100%; height: 100%; }
+    #stp-states .link { stroke: #7fa8c9; stroke-width: 4; stroke-dashoffset: var(--dash, 0); }
+    #stp-states .link-trunk { stroke-width: 7; }
+    #stp-states .link-wireless { stroke-dasharray: 10 8; }
+    #stp-states .link-label, #stp-states .node-label {
+      fill: #cfe0ee; font-family: 'Segoe UI', sans-serif; font-size: 22px; text-anchor: middle;
+    }
+    #stp-states .node-label { font-weight: 600; }
+  </style>
+  <div id="stp-states" data-composition-id="stp-states" data-width="1920" data-height="1080" data-duration="5">
+    <svg class="topo" viewBox="0 0 1920 1080" width="1920" height="1080" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><defs><symbol id="icon-router" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="#1f6fb2" stroke="#0d3c61" stroke-width="3"/><path d="M30 50h40M50 30v40M38 38l24 24M62 38L38 62" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round"/></symbol>
+<symbol id="icon-switch" viewBox="0 0 100 100"><rect x="15" y="30" width="70" height="40" rx="6" fill="#2c8a3d" stroke="#14431d" stroke-width="3"/><path d="M25 50h50M62 42l14 8-14 8M38 58L24 50l14-8" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol></defs>
+<line id="link-l1" x1="252" y1="232" x2="232" y2="492" class="link link-ethernet" stroke-dasharray="261" style="--dash:0" />
+<line id="link-l1-state" x1="252" y1="232" x2="232" y2="492" class="link-state" opacity="0" />
+<line id="link-l2" x1="252" y1="232" x2="252" y2="752" class="link link-ethernet" stroke-dasharray="520" style="--dash:0" />
+<line id="link-l2-state" x1="252" y1="232" x2="252" y2="752" class="link-state" opacity="0" />
+<line id="link-l3" x1="232" y1="492" x2="252" y2="752" class="link link-ethernet" stroke-dasharray="261" style="--dash:0" />
+<line id="link-l3-state" x1="232" y1="492" x2="252" y2="752" class="link-state" opacity="0" />
+<g id="node-R1" class="node" transform="translate(252,232)"><circle id="node-R1-state" class="node-state" cx="0" cy="0" r="62" fill="none" stroke-width="6" opacity="0" /><use href="#icon-router" x="-48" y="-48" width="96" height="96" /><text class="node-label" x="0" y="76">Root</text></g>
+<g id="node-SW1" class="node" transform="translate(232,492)"><circle id="node-SW1-state" class="node-state" cx="0" cy="0" r="62" fill="none" stroke-width="6" opacity="0" /><use href="#icon-switch" x="-48" y="-48" width="96" height="96" /><text class="node-label" x="0" y="76">SW1</text></g>
+<g id="node-SW2" class="node" transform="translate(252,752)"><circle id="node-SW2-state" class="node-state" cx="0" cy="0" r="62" fill="none" stroke-width="6" opacity="0" /><use href="#icon-switch" x="-48" y="-48" width="96" height="96" /><text class="node-label" x="0" y="76">SW2</text></g>
+</svg>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+  <script>
+    (function () {
+      window.__timelines = window.__timelines || {};
+      var TWEENS = [{"at":0.2,"selector":"#node-R1","kind":"reveal-node","from":{"opacity":0,"scale":0.6},"to":{"opacity":1,"scale":1,"duration":0.5,"ease":"back.out(1.6)"}},{"at":0.6,"selector":"#node-SW1","kind":"reveal-node","from":{"opacity":0,"scale":0.6},"to":{"opacity":1,"scale":1,"duration":0.5,"ease":"back.out(1.6)"}},{"at":0.9,"selector":"#node-SW2","kind":"reveal-node","from":{"opacity":0,"scale":0.6},"to":{"opacity":1,"scale":1,"duration":0.5,"ease":"back.out(1.6)"}},{"at":1.2,"selector":"#link-l1","kind":"reveal-link-draw","from":{"--dash":261},"to":{"--dash":0,"duration":0.6,"ease":"power2.out"}},{"at":1.5,"selector":"#link-l2","kind":"reveal-link-draw","from":{"--dash":520},"to":{"--dash":0,"duration":0.6,"ease":"power2.out"}},{"at":1.8,"selector":"#link-l3","kind":"reveal-link-draw","from":{"--dash":261},"to":{"--dash":0,"duration":0.6,"ease":"power2.out"}},{"at":2.6,"kind":"set-state","selector":"#node-R1-state","color":"#0066ff","opacity":0.9,"duration":0.4},{"at":3,"kind":"set-state","selector":"#link-l1-state","color":"#00cc00","opacity":0.9,"duration":0.4},{"at":3.4,"kind":"set-state","selector":"#link-l2-state","color":"#00cc00","opacity":0.9,"duration":0.4},{"at":3.8,"kind":"set-state","selector":"#link-l3-state","color":"#ffaa00","opacity":0.9,"duration":0.4}];
+      var root = document.getElementById('stp-states');
+      var tl = gsap.timeline({ paused: true });
+      var SVGNS = 'http://www.w3.org/2000/svg';
+      var svg = root.querySelector('svg');
+      TWEENS.forEach(function (op) {
+        if (op.kind === 'reveal-node' || op.kind === 'reveal-link-draw' || op.kind === 'reveal-link-fade') {
+          var el = root.querySelector(op.selector);
+          if (el) tl.fromTo(el, op.from, Object.assign({}, op.to), op.at);
+          else console.warn('cisco-topology: no element for ' + op.selector);
+        } else if (op.kind === 'flow') {
+          var g = document.createElementNS(SVGNS, 'g');
+          var c = document.createElementNS(SVGNS, 'circle');
+          c.setAttribute('r', op.r); c.setAttribute('cx', 0); c.setAttribute('cy', 0); c.setAttribute('fill', op.color);
+          g.appendChild(c); g.setAttribute('opacity', '0'); svg.appendChild(g);
+          var p0 = op.points[0];
+          gsap.set(g, { x: p0[0], y: p0[1] }); // park on-canvas at the path start immediately, so pre-op.at seeks never see the raw (0,0) origin default
+          tl.set(g, { x: p0[0], y: p0[1], opacity: 0 }, op.at);
+          tl.to(g, { opacity: 1, duration: 0.2 }, op.at);
+          var t = op.at + 0.2;
+          for (var i = 1; i < op.points.length; i++) {
+            tl.to(g, { x: op.points[i][0], y: op.points[i][1], duration: op.hopDur, ease: 'none' }, t);
+            t += op.hopDur;
+          }
+          tl.to(g, { opacity: 0, duration: 0.2 }, t);
+        } else if (op.kind === 'set-state') {
+          var el = root.querySelector(op.selector);
+          if (el) { tl.set(el, { stroke: op.color }, op.at); tl.to(el, { opacity: op.opacity, duration: op.duration }, op.at); }
+          else console.warn('cisco-topology: no element for ' + op.selector);
+        }
+        // badge kind is added in Task 8
+      });
+      window.__timelines["stp-states"] = tl;
+    })();
+  </script>
+</template>
+</body>
+</html>

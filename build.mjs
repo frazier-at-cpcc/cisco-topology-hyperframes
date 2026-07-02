@@ -58,8 +58,12 @@ export function blockHtml({ id, svg, tweens, width, height, duration }) {
             t += op.hopDur;
           }
           tl.to(g, { opacity: 0, duration: 0.2 }, t);
+        } else if (op.kind === 'set-state') {
+          var el = root.querySelector(op.selector);
+          if (el) { tl.set(el, { stroke: op.color }, op.at); tl.to(el, { opacity: op.opacity, duration: op.duration }, op.at); }
+          else console.warn('cisco-topology: no element for ' + op.selector);
         }
-        // set-state and badge kinds are added in Tasks 6 and 8
+        // badge kind is added in Task 8
       });
       window.__timelines["${id}"] = tl;
     })();

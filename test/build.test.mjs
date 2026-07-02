@@ -105,3 +105,15 @@ test('duration extends past a late flow op end, not just the event at', async ()
   assert.ok(m, 'data-duration present');
   assert.equal(Number(m[1]), 8, `expected duration === 8, got ${m[1]}`);
 });
+
+test('runtime handles set-state via instantaneous stroke set + opacity fade', async () => {
+  const topo = {
+    nodes: [ { id: 'R1', type: 'router', x: 0, y: 0 }, { id: 'SW1', type: 'switch', x: 0, y: 200 } ],
+    links: [ { id: 'l1', from: 'R1', to: 'SW1' } ],
+    events: [ { at: 1, type: 'setState', target: 'l1', state: 'blocking' } ]
+  };
+  const html = await buildBlock(topo, { id: 'state-demo' });
+  assert.match(html, /op\.kind\s*===\s*'set-state'/);                 // the switch handles set-state
+  assert.match(html, /tl\.set\([^;]*stroke:\s*op\.color/);            // color is set, not tweened
+  assert.match(html, /tl\.to\([^;]*opacity:\s*op\.opacity/);          // then faded in
+});
