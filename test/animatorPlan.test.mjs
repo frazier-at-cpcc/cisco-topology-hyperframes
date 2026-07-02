@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { planTimeline, HOP_DUR, PACKET_R, FLOW_COLORS } from '../engine/animatorPlan.mjs';
+import { planTimeline, HOP_DUR, PACKET_R, FLOW_COLORS, STATE_STYLES } from '../engine/animatorPlan.mjs';
 
 const topo = {
   nodes: [ { id: 'R1', type: 'router', x: 300, y: 200 }, { id: 'A', type: 'pc', x: 300, y: 500 } ],
@@ -56,4 +56,30 @@ test('flow with paths[] emits one op per path (flood)', () => {
   const ops = planTimeline(t).filter(o => o.kind === 'flow');
   assert.equal(ops.length, 2);
   assert.ok(ops.every(o => o.color === FLOW_COLORS.broadcast));
+});
+
+test('setState on a link → set-state op targeting the link overlay', () => {
+  const t = {
+    nodes: [ { id: 'R1', type: 'router', x: 0, y: 0 }, { id: 'SW1', type: 'switch', x: 0, y: 100 } ],
+    links: [ { id: 'l1', from: 'R1', to: 'SW1' } ],
+    events: [ { at: 3, type: 'setState', target: 'l1', state: 'blocking' } ]
+  };
+  const op = planTimeline(t).find(o => o.kind === 'set-state');
+  assert.equal(op.selector, '#link-l1-state');
+  assert.equal(op.color, STATE_STYLES.blocking.color);
+  assert.equal(op.opacity, STATE_STYLES.blocking.opacity);
+});
+
+test('setState on a node → node ring overlay selector', () => {
+  const t = {
+    nodes: [ { id: 'R1', type: 'router', x: 0, y: 0 } ], links: [],
+    events: [ { at: 1, type: 'setState', target: 'R1', state: 'active' } ]
+  };
+  assert.equal(planTimeline(t).find(o => o.kind === 'set-state').selector, '#node-R1-state');
+});
+
+test('unknown state is skipped, not crashed', () => {
+  const t = { nodes: [ { id: 'R1', type: 'router', x: 0, y: 0 } ], links: [],
+    events: [ { at: 1, type: 'setState', target: 'R1', state: 'bogus' } ] };
+  assert.equal(planTimeline(t).filter(o => o.kind === 'set-state').length, 0);
 });
